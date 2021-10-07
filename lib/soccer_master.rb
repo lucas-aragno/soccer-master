@@ -1,7 +1,9 @@
 require_relative "./concepts/match_day/model"
 require_relative "./concepts/match_day/operations/add"
 require_relative "./concepts/match_day/operations/has_team"
-require_relative "./concepts/match_day/operations/print_result"
+require_relative "./concepts/match_day/operations/process_results"
+require_relative "./concepts/match_day/operations/accumulate_days_and_results"
+require_relative "./concepts/match_day/operations/print"
 require_relative "./concepts/match/model"
 require_relative "./concepts/team_score/struct"
 
@@ -51,10 +53,16 @@ class SoccerMaster
       end
     end
 
-    match_days.each_with_index do |match_day, index|
+    match_days.each_with_index.reduce([]) do |acc, (match_day, index)|
       puts "Matchday #{index+1}"
-      MatchDay::PrintResult.perform!(match_day: match_day)
+      match_day_results = MatchDay::ProcessResults.perform!(match_day: match_day)
+      day_with_accumulated_results =\
+        MatchDay::AccumulateDaysAndResults.perform(match_day: match_day_results, previous_day_results: acc)
+      day = day_with_accumulated_results[:match_day]
+      accumulated_results = day_with_accumulated_results[:accumulated_results]
+      MatchDay::Print.perform(match_day: day)
       puts "\n"
+      accumulated_results
     end
   end
 end

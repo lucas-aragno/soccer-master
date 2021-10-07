@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require "soccer_master"
+
+entered_ARGV = ARGV.length > 0;
+
+print "#{ARGV[0]}"
+
+if entered_ARGV
+  soccer_master = SoccerMaster.new
+  soccer_master.process(File.join("#{Dir.pwd}", ARGV[0]))
+else
+  print "You need to add a path to the league file"
+end
